@@ -1,41 +1,46 @@
-import numpy as np
 import pygame
-from pixel import Pixel
 
-GRID_SIZE = 28
-width, height = [GRID_SIZE * Pixel.PIXEL_SIZE,] * 2
+from UI.display import Display
+from services.process_data import get_data, read_labels_file
 
-pixels = list()
 
-for y_cord in range(0, height, Pixel.PIXEL_SIZE):
-    for x_cord in range(0, width, Pixel.PIXEL_SIZE):
-        pixels.append(Pixel(x_cord, y_cord))
+class UI:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((Display.width, Display.height))
+        self.display = Display()
+        pygame.display.set_caption("Simple Pygame Window")
+        self.images = get_data("train-images.idx3-ubyte")
+        self.labels = read_labels_file("train-labels.idx1-ubyte")
+        self.image_id = -1
 
-pygame.init()
+    def main(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        self.image_id += 1
+                        self.display.display_image(self.images[self.image_id])
 
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Simple Pygame Window")
+            if pygame.mouse.get_pressed()[0]:
+                self.display.mouse_draw(pygame.mouse.get_pos())
 
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+            if pygame.key.get_pressed()[pygame.K_TAB]:
+                self.display.erase()
 
-    if pygame.mouse.get_pressed()[0]:
-        for pixel in pixels:
-            pixel.update_color(*pygame.mouse.get_pos())
+            self.screen.fill((0, 0, 0))
+            self.display.draw(self.screen)
+            pygame.display.flip()
 
-    if pygame.key.get_pressed()[pygame.K_TAB]:
-        for pixel in pixels:
-            pixel.erase()
+        pygame.quit()
 
-    screen.fill((0, 0, 0))
-    for pixel in pixels:
-        pixel.draw(screen)
-    pygame.display.flip()
+    def get_feature_vector(self):
+        return self.display.get_feature_vector()
 
-feature_vector = np.array([pixel.get_value() for pixel in pixels])
-print(feature_vector)
 
-pygame.quit()
+if __name__ == "__main__":
+    ui = UI()
+    ui.main()

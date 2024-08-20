@@ -29,17 +29,30 @@ class Pixel:
         return sqrt(pow(self.x - mouse_x, 2) + pow(self.y - mouse_y, 2))
 
     def get_value(self):
+        return self.value
+
+    def set_value(self, value):
+        self.value = value
+        self.color = (value * 255, ) * 3
+
+    def get_color(self):
         return self.color[0]
+
+    def set_color(self, shade):
+        self.value = shade / 255
+        self.color = (shade, ) * 3
 
     def update_color(self, mouse_x, mouse_y):
         distance = self.cursor_distance(mouse_x, mouse_y)
-        self.value = distance_to_float(distance)
-        gray_scale = self.value * 255
+        value = distance_to_float(distance)
+        gray_scale = value * 255
         if gray_scale > self.color[0]:
+            self.value = value
             self.color = (gray_scale,) * 3
 
     def erase(self):
         self.color = self.BLACK
+        self.value = 0
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.GRAY, self.border_rect)
