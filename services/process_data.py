@@ -21,14 +21,20 @@ def read_labels_file(filename):
             raise ValueError(
                 f"Magic number mismatch, expected 2049, got {magic}"
             )
-        return array("B", file.read())
+        return np.array(array("B", file.read()))
+
+
+def normalize(images):
+    images = np.array(images)
+    return images.astype('float32') / 255.0
 
 
 def get_data(filename):
     image_data, size, rows, cols = _read_image_file(filename)
+    image_data = normalize(image_data)
     images = list()
     for i in range(size):
         img = np.array(image_data[i * rows * cols:(i + 1) * rows * cols])
-        # img = img.reshape(28, 28)
+        img = img.reshape(28, 28)
         images.append(img)
-    return images
+    return np.array(images)

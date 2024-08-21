@@ -15,8 +15,8 @@ class Display:
         ]
 
     def display_image(self, image_data):
-        for pixel, shade in zip(self.pixels, image_data):
-            pixel.set_color(shade)
+        for pixel, value in zip(self.pixels, image_data):
+            pixel.set_color(value * 255)
 
     def mouse_draw(self, mouse_pos):
         for pixel in self.pixels:
@@ -31,4 +31,6 @@ class Display:
             pixel.draw(surface)
 
     def get_feature_vector(self):
-        return np.array([pixel.get_value() for pixel in self.pixels])
+        n = np.array([pixel.get_value() for pixel in self.pixels]).reshape(28, 28, 1)[np.newaxis, ...]
+        print(n)
+        return n
